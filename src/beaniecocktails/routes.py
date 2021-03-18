@@ -9,6 +9,8 @@ cocktail_router = APIRouter()
 
 
 async def get_cocktail(cocktail_id: PydanticObjectId) -> Cocktail:
+    """ Helper function to look up a cocktail by id """
+
     cocktail = await Cocktail.get(cocktail_id)
     if cocktail is None:
         raise HTTPException(status_code=404, detail="Cocktail not found")
@@ -32,6 +34,8 @@ async def create_cocktail(cocktail: Cocktail):
 
 @cocktail_router.get("/ingredients", response_model=List[IngredientAggregation])
 async def list_ingredients():
+    """ Group on each ingredient name and return a list of `IngredientAggregation`s. """
+
     return await Cocktail.aggregate(
         aggregation_query=[
             {"$unwind": "$ingredients"},
@@ -44,6 +48,8 @@ async def list_ingredients():
 
 @cocktail_router.get("/cocktail_autocomplete", response_model=List[str])
 async def cocktail_autocomplete(fragment: str):
+    """ Return an array of cocktail names matched from a string fragment. """
+
     return [
         c["name"]
         for c in await Cocktail.aggregate(

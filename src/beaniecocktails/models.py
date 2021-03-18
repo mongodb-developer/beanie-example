@@ -24,6 +24,8 @@ class IngredientQuantity(BaseModel):
 
 
 class IngredientAggregation(BaseModel):
+    """ A model for an ingredient count. """
+
     id: str = Field(None, alias="_id")
     total: int
 
