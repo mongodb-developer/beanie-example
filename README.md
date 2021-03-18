@@ -2,7 +2,7 @@
 
 A cocktail API built with MongoDB and Beanie.
 
-This code was written to try out Beanie and was used to write a [blog post](https://developer.mongodb.com/learn/) which may well be more interesting than this code.
+This code was written to try out Beanie and was used to write a [blog post](https://developer.mongodb.com/learn/article/beanie-odm-fastapi-cocktails/) which may well be more interesting than this code.
 
 ## Developing
 
