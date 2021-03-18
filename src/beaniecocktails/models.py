@@ -10,6 +10,7 @@ class Cocktail(Document):
 
     name: str
     ingredients: List["Ingredient"]
+    instructions: List[str]
 
 
 class Ingredient(BaseModel):

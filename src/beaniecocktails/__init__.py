@@ -20,13 +20,8 @@ class Settings(BaseSettings):
 
 @app.on_event("startup")
 async def app_init():
-    # CREATE MOTOR CLIENT
     client = motor.motor_asyncio.AsyncIOMotorClient(
         Settings().mongodb_url, serverSelectionTimeoutMS=100
     )
-
-    # INIT BEANIE
     init_beanie(client.get_default_database(), document_models=[Cocktail])
-
-    # ADD ROUTES
-    app.include_router(cocktail_router, prefix="/v1", tags=["notes"])
+    app.include_router(cocktail_router, prefix="/v1")
