@@ -1,41 +1,41 @@
 {
-    "_id": "5f7daa158ec9dfb536781b0a",
-    "name": "Hunter's Moon",
-    "ingredients": [
-        {
-            "name": "Vermouth",
-            "quantity": {
-                "quantity": "25",
-                "unit": "ml"
-            }
-        },
-        {
-            "name": "Maraschino Cherry",
-            "quantity": {
-                "quantity": "15",
-                "unit": "ml"
-            }
-        },
-        {
-            "name": "Sugar Syrup",
-            "quantity": {
-                "quantity": "10",
-                "unit": "ml"
-            }
-        },
-        {
-            "name": "Lemonade",
-            "quantity": {
-                "quantity": "100",
-                "unit": "ml"
-            }
-        },
-        {
-            "name": "Blackberries",
-            "quantity": {
-                "quantity": "2",
-                "unit": null
-            }
-        }
-    ]
+  "name": "Hunter's Moon",
+  "ingredients": [
+    {
+      "name": "Vermouth",
+      "quantity": {
+        "quantity": "25",
+        "unit": "ml"
+      }
+    },
+    {
+      "name": "Maraschino Cherry",
+      "quantity": {
+        "quantity": "15",
+        "unit": "ml"
+      }
+    },
+    {
+      "name": "Sugar Syrup",
+      "quantity": {
+        "quantity": "10",
+        "unit": "ml"
+      }
+    },
+    {
+      "name": "Lemonade",
+      "quantity": {
+        "quantity": "100",
+        "unit": "ml"
+      }
+    },
+    {
+      "name": "Blackberries",
+      "quantity": {
+        "quantity": "2",
+        "unit": "items"
+      }
+    }
+  ],
+  "instructions": ["Add all the ingredients.", "Shake with ice.", "Serve with a cherry on top."]
 }
