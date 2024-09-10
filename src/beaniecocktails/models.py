@@ -30,5 +30,5 @@ class IngredientAggregation(BaseModel):
     total: int
 
 
-Cocktail.update_forward_refs()
-Ingredient.update_forward_refs()
+# Cocktail.update_forward_refs()
+# Ingredient.update_forward_refs()

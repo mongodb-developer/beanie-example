@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException, Depends
-from beanie.fields import PydanticObjectId
+from beanie import PydanticObjectId
 
 from .models import Cocktail, IngredientAggregation
 
@@ -37,12 +37,12 @@ async def list_ingredients():
     """ Group on each ingredient name and return a list of `IngredientAggregation`s. """
 
     return await Cocktail.aggregate(
-        aggregation_query=[
+        aggregation_pipeline=[
             {"$unwind": "$ingredients"},
             {"$group": {"_id": "$ingredients.name", "total": {"$sum": 1}}},
             {"$sort": {"_id": 1}},
         ],
-        item_model=IngredientAggregation,
+        projection_model=IngredientAggregation,
     ).to_list()
 
 
@@ -53,7 +53,7 @@ async def cocktail_autocomplete(fragment: str):
     return [
         c["name"]
         for c in await Cocktail.aggregate(
-            aggregation_query=[
+            aggregation_pipeline=[
                 {
                     "$search": {
                         "autocomplete": {

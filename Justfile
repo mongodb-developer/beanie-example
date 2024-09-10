@@ -22,4 +22,4 @@ release: dist
 	twine upload dist/*.*
 
 run:
-	uvicorn beaniecocktails:app --reload --debug
+	uvicorn --reload beaniecocktails:app 
