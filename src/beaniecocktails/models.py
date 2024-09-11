@@ -5,8 +5,9 @@ from pydantic import BaseModel, Field
 
 
 class Cocktail(Document):
-    class DocumentMeta:
-        collection_name = "recipes"
+
+    class Settings:
+        name = "recipes"
 
     name: str
     ingredients: List["Ingredient"]
