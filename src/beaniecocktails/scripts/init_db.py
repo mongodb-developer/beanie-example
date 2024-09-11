@@ -1,130 +1,142 @@
-from asyncio import run
+"""
+init-db - A crude script to generate some sample cocktail data.
+
+(This must be run from the project root,
+otherwise it won't be able to load seed cocktail file, "hunters_moon.json")
+"""
+
+from argparse import ArgumentParser
+import asyncio
 from pathlib import Path
+from random import randint
+import sys
+
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+from tqdm import tqdm
 
 from beaniecocktails import Settings
 from beaniecocktails.models import Cocktail
 
-from motor.motor_asyncio import AsyncIOMotorClient
-from beanie import init_beanie
-from random import randint
-
 COCKTAIL_NAMES = [
-    "Sour Cherry",
-    "Spicy Mango Mule",
-    "Blue Hawaiian",
-    "Gin Fizz",
-    "Classic Daiquiri",
-    "Pomegranate Martini",
-    "Southern Belle",
-    "French 75",
-    "Espresso Con Panna",
-    "Smoky Sour",
-    "Cucumber Gimlet",
-    "Dark 'N' Stormy",
     "Basil Gimlet",
-    "Spiked Apple Cider",
-    "Pear-fect Punch",
     "Black Russian",
-    "Sakura Spritz",
-    "Classic Gin and Tonic",
-    "Irish Mule",
-    "Whiskey Smash",
-    "Lemon Drop",
-    "French Connection",
-    "Tequila Sunrise",
-    "Pimm's Cup",
-    "Vieux Carré",
-    "Grapefruit Basil Martini",
-    "Hemingway Daiquiri",
-    "Old Fashioned",
-    "Julep",
-    "Cognac Old Fashioned",
-    "Tom Collins",
-    "Sloe Gin Fizz",
-    "Shirley Temple",
+    "Blackberry Bourbon Smash",
+    "Blood and Sand",
+    "Blue Hawaiian",
+    "Blue Lagoon",
     "Bourbon Street",
     "Caipirinha",
-    "Penicillin",
-    "Corpse Reviver #2",
-    "Blood and Sand",
-    "El Diablo",
-    "Scorpion's Tail",
-    "Golden Bee",
-    "Blue Lagoon",
-    "Lillet Spritz",
-    "Hemingway Special",
-    "Cucumber Collins",
-    "Classic Mojito",
-    "Peach Bellini",
-    "Blackberry Bourbon Smash",
-    "Green Fairy",
-    "Whiskey Sour",
-    "Tequila Sunrise (Frozen)",
-    "Midnight Express",
-    "French 75 (French Connection)",
     "Champagne Cocktail",
-    "Sloe Gin Fizz",
-    "Cucumber Gimlet",
-    "Smoky Sour",
-    "Irish Coffee",
-    "Blood and Sand",
+    "Classic Daiquiri",
+    "Classic Gin and Tonic",
+    "Classic Mojito",
+    "Cognac Old Fashioned",
     "Corpse Reviver #2",
-    "Penicillin",
-    "El Diablo",
-    "Black Russian",
-    "Tequila Sunrise (Regular)",
-    "Spiked Apple Cider",
-    "Whiskey Smash",
-    "Sour Cherry",
-    "Julep",
-    "French Connection",
-    "Shirley Temple",
-    "Hemingway Daiquiri",
-    "Basil Gimlet",
+    "Cucumber Collins",
+    "Cucumber Gimlet",
     "Dark 'N' Stormy",
-    "Tequila Sunrise (Frozen)",
-    "Pimm's Cup",
-    "Southern Belle",
+    "El Diablo",
+    "Espresso Con Panna",
+    "French 75",
+    "French Connection",
+    "Gin Fizz",
+    "Golden Bee",
+    "Grapefruit Basil Martini",
+    "Green Fairy",
+    "Hemingway Daiquiri",
+    "Hemingway Special",
+    "Irish Coffee",
+    "Irish Mule",
+    "Julep",
+    "Lemon Drop",
     "Lillet Spritz",
     "Midnight Express",
-    "Whiskey Sour",
-    "Green Fairy",
     "Old Fashioned",
-    "Blackberry Bourbon Smash",
+    "Peach Bellini",
+    "Pear-fect Punch",
     "Penicillin",
-    "Sloe Gin Fizz",
-    "Bourbon Street",
-    "Tequila Sunrise (Regular)",
-    "Irish Coffee",
-    "Corpse Reviver #2",
-    "Blood and Sand",
-    "Cognac Old Fashioned",
+    "Pimm's Cup",
+    "Pomegranate Martini",
+    "Sakura Spritz",
     "Scorpion's Tail",
-    "Hemingway Special",
-    "French 75",
+    "Shirley Temple",
+    "Sloe Gin Fizz",
+    "Smoky Sour",
+    "Sour Cherry",
+    "Southern Belle",
+    "Spicy Mango Mule",
+    "Spiked Apple Cider",
+    "Tequila Sunrise (Frozen)",
+    "Tequila Sunrise (Regular)",
+    "Tom Collins",
+    "Vieux Carré",
+    "Whiskey Smash",
+    "Whiskey Sour",
 ]
 
 
-def main():
-    run(amain())
+def main(argv=sys.argv[1:]):
+    arg_parser = ArgumentParser(description=__doc__)
+    arg_parser.add_argument(
+        "-C", "--clear-collection", action="store_true", default=False
+    )
+    arg_parser.add_argument("-d", "--dummy-data", action="store_true")
+
+    args = arg_parser.parse_args(argv)
+    asyncio.run(
+        amain(clear_collection=args.clear_collection, create_dummy_data=args.dummy_data)
+    )
 
 
-async def amain():
+async def amain(clear_collection=False, create_dummy_data=True):
     client: AsyncIOMotorClient = AsyncIOMotorClient(
         Settings().mongodb_url,
         connectTimeoutMS=1000,
         socketTimeoutMS=1000,
         serverSelectionTimeoutMS=1000,
     )
-    await init_beanie(client.get_default_database(), document_models=[Cocktail])
-    json = Path("sample_data/hunters_moon.json").read_text()
-    for name in COCKTAIL_NAMES:
-        template_cocktail = Cocktail.model_validate_json(json)
-        print("Input:", template_cocktail.id)
-        template_cocktail.name = name
-        for _ in range(randint(0, 3)):
-            del template_cocktail.ingredients[
-                randint(0, len(template_cocktail.ingredients) - 1)
-            ]
-        await template_cocktail.save()
-        print(f"Saved {name}")
+    db = client.get_default_database()
+    await init_beanie(db, document_models=[Cocktail])
+
+    if clear_collection:
+        print("Delete existing cocktails.")
+        await Cocktail.delete_all()
+
+    # Create the autocomplete index if necessary:
+    recipes = Cocktail.get_motor_collection()
+    if not await recipes.list_search_indexes("autocomplete_name").to_list(length=1):
+        print("Create autocomplete index on 'name' field ...")
+        await db.create_collection(recipes.name)
+        await recipes.create_search_index(
+            {
+                "definition": {
+                    "mappings": {
+                        "dynamic": False,
+                        "fields": {"name": {"type": "autocomplete"}},
+                    }
+                },
+                "name": "autocomplete_name",
+            }
+        )
+    else:
+        print("Autocomplete index already exists on 'name' field.")
+
+    if create_dummy_data:
+        print("Create dummy cocktail data.")
+        json = Path("sample_data/hunters_moon.json").read_text()
+
+        progress = tqdm(COCKTAIL_NAMES, desc="Loading Cocktails")
+        for name in progress:
+            # Load the seed cocktail:
+            template_cocktail = Cocktail.model_validate_json(json)
+            # Rename it to the current cocktail name:
+            template_cocktail.name = name
+            # Now remove between 0-3 ingredients, so the cocktails aren't all identical:
+            for _ in range(randint(0, 3)):
+                del template_cocktail.ingredients[
+                    randint(0, len(template_cocktail.ingredients) - 1)
+                ]
+            # Finally, save the cocktail:
+            await template_cocktail.save()
+            progress.write(name)

@@ -27,6 +27,7 @@ setup(
         "pydantic == 2.9.1",
         "pydantic-settings==2.4.0",
         "motor==3.5.1",
+        "tqdm==4.66.5",
         "uvicorn",
     ],
     extras_require=EXTRAS_REQUIRE,
