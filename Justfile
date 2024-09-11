@@ -1,5 +1,8 @@
-test:
-	python -m pytest
+run:
+	uvicorn --reload beaniecocktails:app 
+
+check:
+	python -m ruff check
 
 clean:
 	rm -rf build dist src/*.egg-info .tox .pytest_cache pip-wheel-metadata .DS_Store
@@ -11,15 +14,3 @@ install:
 
 dev:
 	python -m pip install -e .[dev]
-
-dist: clean
-	git diff --exit-code			# Check for unstaged changes
-	git diff --exit-code --cached	# Check for uncommitted changes
-	check-manifest
-	python setup.py sdist bdist_wheel
-
-release: dist
-	twine upload dist/*.*
-
-run:
-	uvicorn --reload beaniecocktails:app 

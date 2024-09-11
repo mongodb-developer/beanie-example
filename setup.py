@@ -7,10 +7,7 @@ EXTRAS_REQUIRE = {
     ],
 }
 EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + [
-    "black",
-    "twine",
-    "wheel",
-    "prospector[with_everything]",
+    "ruff",
 ]
 
 setup(
