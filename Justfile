@@ -1,5 +1,5 @@
 run:
-	uvicorn --reload beaniecocktails:app 
+	python -m uvicorn --reload beaniecocktails:app 
 
 check:
 	python -m ruff check
